@@ -8,8 +8,8 @@ import java.nio.charset.StandardCharsets;
 public class FileMessage extends Message {
     private static final Charset charset = StandardCharsets.UTF_8;
 
-    private static final int MENU_DB_FILE = 1;
-    private static final int TABLE_STATUS_DB_FILE = 2;
+    public static final int MENU_DB_FILE = 1;
+    public static final int TABLE_STATUS_DB_FILE = 2;
 
     private static final String JSON_FILE_TYPE = "fileType";
 
