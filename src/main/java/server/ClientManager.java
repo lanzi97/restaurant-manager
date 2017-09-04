@@ -1,12 +1,11 @@
 package server;
 
+import client.messages.FileMessage;
 import client.messages.Message;
 
 import javax.json.Json;
 import javax.json.JsonWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 public class ClientManager implements Runnable {
@@ -60,6 +59,16 @@ public class ClientManager implements Runnable {
         @Override
         public void onMessageReceived(Message message) {
             System.out.println("Message received. Code = " + message.getMessageCode() + " // Content = " + message.createJsonObject());  //TODO
+            if (message instanceof FileMessage) {
+                try {
+                    FileOutputStream fileOutputStream = new FileOutputStream("D:\\test.db");
+                    fileOutputStream.write(message.getExtraData());
+                    fileOutputStream.close();
+                    System.out.println("Scritto in D:\\test.db");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     };
 }

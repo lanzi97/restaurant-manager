@@ -1,6 +1,8 @@
 package realClient;
 
+import client.messages.FileMessage;
 import client.messages.Message;
+import client.messages.MessageCode;
 import client.messages.OrderMessage;
 import server.SocketReaderAsync;
 import utils.Utils;
@@ -71,7 +73,7 @@ public class Client extends Thread {
     public void sendNewOrder() {
         String input = "{\"tableNumber\":10,\"numClients\":4,\"priceListId\":0,\"plates\":[{\"plateId\":1,\"modifications\":[1,2],\"memo\":\"\"},{\"plateId\":2,\"modifications\":[],\"memo\":\"\"},{\"plateId\":4,\"modifications\":[],\"memo\":\"\"},{\"plateId\":6,\"modifications\":[],\"memo\":\"\"}]}";
         JsonReader reader = Json.createReader(new StringReader(input));
-        OrderMessage message = new OrderMessage((byte) 2, reader.readObject());
+        OrderMessage message = new OrderMessage(MessageCode.PLACE_ORDER, reader.readObject());
         sendMessage(message);
     }
 
@@ -86,8 +88,10 @@ public class Client extends Thread {
                 i++;
                 read = fileStream.read();
             }
-            System.out.println("num byte : " + data.length + " = " + i);
+            fileStream.close();
 
+            FileMessage message = new FileMessage(MessageCode.FILE_MESSAGE, FileMessage.MENU_DB_FILE, data);
+            sendMessage(message);
         } catch (IOException e) {
             e.printStackTrace();
         }
