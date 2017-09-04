@@ -3,6 +3,7 @@ package realClient;
 import client.messages.Message;
 import client.messages.OrderMessage;
 import server.SocketReaderAsync;
+import utils.Utils;
 
 import javax.json.Json;
 import javax.json.JsonReader;
@@ -37,9 +38,28 @@ public class Client extends Thread {
      */
     private boolean sendMessage(Message message) {
         try {
+            // Write message code
             outputStream.write(message.getMessageCode());
+
+            // Write extra data lenght
+            if(message.getExtraData() != null) {
+                byte[] extraData = message.getExtraData();
+                byte[] length = Utils.intToByteArray(extraData.length);
+                outputStream.write(length);
+                // Write extra data
+                for(int i = 0; i < extraData.length; i++) {
+                    outputStream.write(extraData[i]);
+                }
+            }
+            else {
+                byte[] byte0 = Utils.intToByteArray(0);
+                outputStream.write(byte0);
+            }
+
+            // Write content of message (json)
             JsonWriter jsonWriter = Json.createWriter(outputStream);
             jsonWriter.writeObject(message.createJsonObject());
+            // Finish this message
             outputStream.flush();
             return true;
         } catch (IOException e) {

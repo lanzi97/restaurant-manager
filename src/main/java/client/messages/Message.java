@@ -52,4 +52,14 @@ public abstract class Message {
                     return null;
         }
     }
+
+    public static Message getMessage(byte messageCode, JsonObject jsonObject, byte[] extraData) {
+        switch (messageCode) {
+            case MessageCode.FILE_MESSAGE:
+                return new FileMessage(messageCode, jsonObject, extraData);
+            //... INSERT HERE (NEW MESSAGE CODES)...
+            default:
+                return null;
+        }
+    }
 }

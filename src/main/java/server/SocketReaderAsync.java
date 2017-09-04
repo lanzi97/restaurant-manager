@@ -1,6 +1,7 @@
 package server;
 
 import client.messages.Message;
+import utils.Utils;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -27,12 +28,35 @@ public class SocketReaderAsync extends Thread{
      */
     public Message readMessageSync() {
         try {
+            // Read message code
             byte messageCode = (byte) inputStream.read();
+            // Read extra data
+            byte[] extraData = null;
+            // Read extra data length
+            byte[] lengthByte = new byte[4];
+            lengthByte[0] = (byte) inputStream.read();
+            lengthByte[1] = (byte) inputStream.read();
+            lengthByte[2] = (byte) inputStream.read();
+            lengthByte[3] = (byte) inputStream.read();
+
+            int length = Utils.byteArrayToInt(lengthByte);
+            if(length != 0) {
+                extraData = new byte[length];
+                for(int i = 0; i < length; i++) {
+                    extraData[i] = (byte) inputStream.read();
+                }
+            }
+
+
+            // Read message content (json)
             JsonReader jsonReader = Json.createReader(inputStream);
             JsonObject jsonObject = jsonReader.readObject();
 
-
-            return Message.getMessage(messageCode, jsonObject);
+            // Return read message
+            if(extraData == null)
+                return Message.getMessage(messageCode, jsonObject);
+            else
+                return Message.getMessage(messageCode, jsonObject, extraData);
         } catch (Exception e) {
             if(!e.getLocalizedMessage().equals("Connection reset"))
                 e.printStackTrace();
